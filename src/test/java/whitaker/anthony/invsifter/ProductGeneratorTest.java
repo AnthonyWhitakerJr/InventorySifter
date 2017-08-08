@@ -92,4 +92,11 @@ public class ProductGeneratorTest {
 		assertTrue("Some candidates missing", productCandidates.containsAll(expected));
 	}
 
+	@Test
+	public void testProductGenerator_SanityCheck() {
+		ProductGenerator generator = new ProductGenerator(null);
+		assertNotNull(generator.getProductCandidates());
+		assertTrue(generator.getProductCandidates().isEmpty());
+	}
+
 }
