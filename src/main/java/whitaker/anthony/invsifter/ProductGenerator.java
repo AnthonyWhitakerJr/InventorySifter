@@ -97,7 +97,7 @@ public class ProductGenerator {
 		return stream.map(s -> s.split(delimiter))
 				.map(strings -> {
 					if(strings.length != 2)
-						throw new IllegalArgumentException("Parsing with delimiter \"" + delimiter + "\" produced wrong about of fields.");
+						throw new IllegalArgumentException("Parsing with delimiter \"" + delimiter + "\" produced wrong amount of fields.");
 					return new ProductCandidate(strings[0], strings[1]);
 				})
 				.collect(Collectors.toCollection(ArrayList::new));

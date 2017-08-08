@@ -61,6 +61,19 @@ public class ProductGeneratorTest {
 	}
 
 	@Test
+	public void testGetRandomDate_Exception() {
+		LocalDate start = LocalDate.now().plusWeeks(2);
+		LocalDate end = LocalDate.now();
+
+		try {
+			ProductGenerator.getRandomDate(start, end);
+			fail();
+		} catch(IllegalArgumentException e) {
+			assertEquals("Start date must precede end date.", e.getMessage());
+		}
+	}
+
+	@Test
 	public void testGetRandomListIndex() {
 		Collection collection = Arrays.asList("0", "1", "2", "3", "4");
 		for(int i = 0; i < 5; i++) {
@@ -68,6 +81,11 @@ public class ProductGeneratorTest {
 			assertTrue("Random index too small", 0 <= index);
 			assertTrue("Random index too large", collection.size() > index);
 		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testParseProductCandidateFile_Exception() {
+		ProductGenerator.parseProductCandidateFile("BogusFilename", ",");
 	}
 
 	@Test
@@ -90,6 +108,26 @@ public class ProductGeneratorTest {
 
 		assertTrue("Extra candidates created", expected.containsAll(productCandidates));
 		assertTrue("Some candidates missing", productCandidates.containsAll(expected));
+	}
+
+	@Test
+	public void testParseProductCandidates_Exception() {
+		String candidates = "Beverages|Coffee\n" +
+				"Refrigerated Foods|Bacon";
+
+		try {
+			ProductGenerator.parseProductCandidates(Arrays.stream(candidates.split("\n")), "|");
+			fail();
+		} catch(IllegalArgumentException e) {
+			assertTrue(e.getMessage().endsWith("wrong amount of fields."));
+		}
+	}
+
+	@Test
+	public void testProductGenerator_SanityCheck() {
+		ProductGenerator generator = new ProductGenerator(null);
+		assertNotNull(generator.getProductCandidates());
+		assertTrue(generator.getProductCandidates().isEmpty());
 	}
 
 }

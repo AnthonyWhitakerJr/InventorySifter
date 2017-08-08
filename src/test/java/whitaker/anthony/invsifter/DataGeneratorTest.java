@@ -1,45 +1,88 @@
 package whitaker.anthony.invsifter;
 
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static whitaker.anthony.invsifter.DataGenerator.DEFAULT_EXPIRATION_DATE_FORMAT;
+import static whitaker.anthony.invsifter.DataGenerator.DEFAULT_EXPIRATION_DATE_LOCALE;
 
-@Ignore("MANUAL RUN ONLY. USE TO GENERATE DATA FOR TESTING.")
 public class DataGeneratorTest {
 
 	public static final String DELIMITER = ";";
-	public static final String FILENAME_DATASET_1 = "src/test/resources/dataset1.txt";
-	public static final String FILENAME_DATASET_2 = "src/test/resources/dataset2.txt";
-	public static final String FILENAME_DATASET_3 = "src/test/resources/dataset3.txt";
+
+	DataGenerator generator;
+
+	@Before
+	public void setup() {
+		generator = new DataGenerator("src/main/resources/ProductCandidates.txt", DELIMITER, null, null);
+	}
 
 	@Test
-	public void generateTestData() {
-		DataGenerator generator = new DataGenerator("src/main/resources/ProductCandidates.txt", DELIMITER, null, null);
+	public void testExpirationDateFormat_SanityCheck() {
+		generator.setExpirationDateFormat("yyyy-MMM-dd");
+		assertEquals("yyyy-MMM-dd", generator.getExpirationDateFormat());
+	}
 
+	@Test
+	public void testExpirationDateLocale_SanityCheck() {
+		generator.setExpirationDateLocale(Locale.CANADA);
+		assertEquals(Locale.CANADA, generator.getExpirationDateLocale());
+	}
+
+	@Test
+	public void testGenerateDataSet() {
 		int numberOfProductsInSet = 25;
 		Collection<Product> dataset = generator.generateDataSet(numberOfProductsInSet, LocalDate.now(), LocalDate.now().plusYears(1));
 		assertEquals(numberOfProductsInSet, dataset.size());
-		generator.writeDataSetToFile(dataset, FILENAME_DATASET_1, DELIMITER);
-		assertTrue("File not created correctly.", Files.isRegularFile(Paths.get(FILENAME_DATASET_1)));
+		assertFalse(dataset.contains(null));
+	}
 
-		numberOfProductsInSet = 25;
-		dataset = generator.generateDataSet(numberOfProductsInSet, LocalDate.now().plusMonths(2), LocalDate.now().plusMonths(14));
-		assertEquals(numberOfProductsInSet, dataset.size());
-		generator.writeDataSetToFile(dataset, FILENAME_DATASET_2, DELIMITER);
-		assertTrue("File not created correctly.", Files.isRegularFile(Paths.get(FILENAME_DATASET_2)));
+	@Test
+	public void testGenerateDataSet_InvalidSize1() {
+		try {
+			generator.generateDataSet(0, LocalDate.now(), LocalDate.now().plusYears(1));
+			fail();
+		} catch(IllegalArgumentException e) {
+			assertEquals("Invalid size.", e.getMessage());
+		}
+	}
 
-		numberOfProductsInSet = 25;
-		dataset = generator.generateDataSet(numberOfProductsInSet, LocalDate.now().plusMonths(6), LocalDate.now().plusMonths(18));
+	@Test
+	public void testGenerateDataSet_InvalidSize2() {
+		try {
+			generator.generateDataSet(200, LocalDate.now(), LocalDate.now().plusYears(1));
+			fail();
+		} catch(IllegalArgumentException e) {
+			assertEquals("Invalid size.", e.getMessage());
+		}
+	}
+
+	@Test
+	public void testWriteDataSetToFile() {
+		int numberOfProductsInSet = 25;
+		Collection<Product> dataset = generator.generateDataSet(numberOfProductsInSet, LocalDate.now(), LocalDate.now().plusYears(1));
 		assertEquals(numberOfProductsInSet, dataset.size());
-		generator.writeDataSetToFile(dataset, FILENAME_DATASET_3, DELIMITER);
-		assertTrue("File not created correctly.", Files.isRegularFile(Paths.get(FILENAME_DATASET_3)));
+		generator.writeDataSetToFile(dataset, "DELETE_ME.txt", DELIMITER);
+		assertTrue("File not created correctly.", Files.isRegularFile(Paths.get("DELETE_ME.txt")));
+
+		List<Product> products = DataGenerator.parseProductsFromFile("DELETE_ME.txt", DELIMITER, DEFAULT_EXPIRATION_DATE_FORMAT, DEFAULT_EXPIRATION_DATE_LOCALE);
+		assertEquals(25, products.size());
+		assertFalse(products.contains(null));
+
+		try {
+			Files.deleteIfExists(Paths.get("DELETE_ME.txt"));
+		} catch(IOException e) {
+			e.printStackTrace(); // Unable to delete file. Not a terrible issue.
+		}
 	}
 
 }
