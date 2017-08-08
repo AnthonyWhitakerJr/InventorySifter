@@ -10,6 +10,7 @@ public class ProductCandidateTest {
 		ProductCandidate candidate = new ProductCandidate("Foo", "Bar");
 		assertEquals(candidate, candidate);
 		assertNotEquals(new Object(), candidate);
+		assertNotEquals(null, candidate);
 	}
 
 	@Test
