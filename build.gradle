@@ -2,6 +2,7 @@ group 'InventorySifter'
 version '1.1-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8
 

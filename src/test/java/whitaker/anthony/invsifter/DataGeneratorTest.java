@@ -15,13 +15,13 @@ import static org.junit.Assert.assertTrue;
 public class DataGeneratorTest {
 
 	public static final String DELIMITER = ";";
-	public static final String FILENAME_DATASET_1 = "res/dataset1.txt";
-	public static final String FILENAME_DATASET_2 = "res/dataset2.txt";
-	public static final String FILENAME_DATASET_3 = "res/dataset3.txt";
+	public static final String FILENAME_DATASET_1 = "src/test/resources/dataset1.txt";
+	public static final String FILENAME_DATASET_2 = "src/test/resources/dataset2.txt";
+	public static final String FILENAME_DATASET_3 = "src/test/resources/dataset3.txt";
 
 	@Test
 	public void generateTestData() {
-		DataGenerator generator = new DataGenerator("res/ProductCandidates.txt", DELIMITER, null, null);
+		DataGenerator generator = new DataGenerator("src/main/resources/ProductCandidates.txt", DELIMITER, null, null);
 
 		int numberOfProductsInSet = 25;
 		Collection<Product> dataset = generator.generateDataSet(numberOfProductsInSet, LocalDate.now(), LocalDate.now().plusYears(1));
