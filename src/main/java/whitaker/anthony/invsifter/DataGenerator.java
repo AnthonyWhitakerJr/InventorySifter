@@ -30,7 +30,7 @@ class DataGenerator {
 	 * @param expirationDateLocale Locale of expiration date, not null.
 	 * @throws IllegalArgumentException If unable to parse product candidate file properly with given delimiter.
 	 */
-	DataGenerator(String filename, String delimiter, String expirationDateFormat, Locale expirationDateLocale) {
+	public DataGenerator(String filename, String delimiter, String expirationDateFormat, Locale expirationDateLocale) {
 		ArrayList<ProductCandidate> productCandidates = ProductGenerator.parseProductCandidateFile(filename, delimiter);
 		this.productGenerator = new ProductGenerator(productCandidates);
 		this.setExpirationDateFormat(expirationDateFormat);
@@ -76,7 +76,7 @@ class DataGenerator {
 	 * @param expirationDateMax upper bound for expiration date.
 	 * @return A dataset of the given size by generating random products based on the product previously set product candidates, random expiration dates within given bounds and random product numbers.
 	 */
-	Collection<Product> generateDataSet(int size, LocalDate expirationDateMin, LocalDate expirationDateMax) {
+	public Collection<Product> generateDataSet(int size, LocalDate expirationDateMin, LocalDate expirationDateMax) {
 		if(size < 1 || size > productGenerator.getProductCandidates().size())
 			throw new IllegalArgumentException("Invalid size.");
 		return IntStream.range(0, size).mapToObj(i -> productGenerator.createRandomProduct(expirationDateMin, expirationDateMax)).collect(Collectors.toList());
@@ -89,7 +89,7 @@ class DataGenerator {
 	 * @param filename  Name of file to create/overwrite.
 	 * @param delimiter Delimiter to use between product fields.
 	 */
-	void writeDataSetToFile(Collection<Product> dataset, String filename, String delimiter) {
+	public void writeDataSetToFile(Collection<Product> dataset, String filename, String delimiter) {
 		try(PrintWriter out = new PrintWriter(Files.newBufferedWriter(Paths.get(filename)))) {
 			dataset.stream()
 					.map(product -> product.toDelimitedString(delimiter, expirationDateFormat, expirationDateLocale))
